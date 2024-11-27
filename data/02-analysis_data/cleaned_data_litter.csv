@@ -1,4 +1,4 @@
-WARD,Days serviced - 1,Days serviced - 3,Days serviced - 5,Asset type - WR1,Asset type - WR2,Asset type - WR3,Asset type - WR4,Status - Existing,Status - Temporarily Removed,Days serviced - 7,Days serviced - 4
+WARD,Days_serviced_1,Days_serviced_3,Days_serviced_5,Asset_type_WR1,Asset_type_WR2,Asset_type_WR3,Asset_type_WR4,Status_Existing,Status_Temporarily Removed,Days_serviced_7,Days_serviced_4
 Ward1,71,174,286,142,276,3,110,470,61,0,0
 Ward2,60,210,100,136,165,5,67,359,14,3,0
 Ward3,52,25,329,177,242,16,172,577,30,201,0

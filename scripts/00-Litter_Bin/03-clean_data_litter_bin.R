@@ -17,13 +17,11 @@ litter_bin_data <- read_csv("data/01-raw_data/raw_data_litter_bin.csv")
 cleaned_data <- litter_bin_data %>%
   select(
     WARD,            # Ward information
-    `DAYS SERVICED`, # Number of days the bin is serviced
-    `ASSET TYPE`,    # Type of litter bin
+    'DAYS SERVICED', # Number of days the bin is serviced
+    'ASSET TYPE',    # Type of litter bin
     STATUS           # Status of the bin (active/inactive)
   ) %>%
   drop_na()          # Remove rows with any missing values
-
-write_csv(cleaned_data, "data/02-analysis_data/cleaned_data.csv")
 
 # Convert WARD to Ward1, Ward2, ..., Ward25 format and ensure the order
 cleaned_data <- cleaned_data %>%
@@ -33,29 +31,29 @@ cleaned_data <- cleaned_data %>%
 # Reshape the data to wide format
 wide_data <- cleaned_data %>%
   mutate(across(
-    .cols = c(`DAYS SERVICED`, `ASSET TYPE`, STATUS),
+    .cols = c('DAYS SERVICED', 'ASSET TYPE', STATUS),
     .fns = as.character # Convert all columns to character to ensure compatibility
   )) %>%
   pivot_longer(
-    cols = c(`DAYS SERVICED`, `ASSET TYPE`, STATUS),
+    cols = c('DAYS SERVICED', 'ASSET TYPE', STATUS),
     names_to = "Variable",
     values_to = "Value"
   ) %>%
   mutate(Value_Label = case_when(
-    Variable == "DAYS SERVICED" ~ paste0("Days serviced - ", Value),
-    Variable == "ASSET TYPE" ~ paste0("Asset type - ", Value),
-    Variable == "STATUS" ~ paste0("Status - ", Value)
+    Variable == "DAYS SERVICED" ~ paste0("Days_serviced_", Value),
+    Variable == "ASSET TYPE" ~ paste0("Asset_type_", Value),
+    Variable == "STATUS" ~ paste0("Status_", Value)
   )) %>%
   # Explicitly order Value_Label
   mutate(Value_Label = factor(
     Value_Label,
     levels = c(
       # List days serviced in ascending order
-      paste0("Days serviced - ", sort(as.numeric(unique(litter_bin_data$`DAYS SERVICED`)))),
+      paste0("Days_serviced_", sort(as.numeric(unique(litter_bin_data$'DAYS SERVICED')))),
       # List asset types alphabetically
-      paste0("Asset type - ", sort(unique(litter_bin_data$`ASSET TYPE`))),
+      paste0("Asset_type_", sort(unique(litter_bin_data$'ASSET TYPE'))),
       # List statuses alphabetically
-      paste0("Status - ", sort(unique(litter_bin_data$STATUS)))
+      paste0("Status_", sort(unique(litter_bin_data$STATUS)))
     )
   )) %>%
   group_by(WARD, Value_Label) %>%
@@ -80,5 +78,4 @@ transposed_data <- wide_data %>%
 
 # Save the transposed dataset
 write_csv(transposed_data, "data/02-analysis_data/cleaned_data_litter.csv")
-
 

@@ -1,11 +1,14 @@
 #### Preamble ####
-# Purpose: Downloads and saves the data from [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Downloads and saves data from the City of Toronto's Open Data Portal 
+#          on litter bin collection frequency for further analysis.
+# Author: Jiwon Choi
+# Date: 27 November 2024
+# Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: Ensure necessary R libraries (`opendatatoronto`, `readr`) are installed 
+#                 and have an active internet connection to access the data portal.
+# Any other information needed? Ensure write permissions to the `data/01-raw_data/` directory 
+#                               to save the downloaded dataset.
 
 
 #### Workspace setup ####

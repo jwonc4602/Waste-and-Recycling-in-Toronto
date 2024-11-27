@@ -1,10 +1,9 @@
 #### Preamble ####
-# Purpose: Tests the integrity and validity of the ward datasets
+# Purpose: Validate the integrity and structure of the cleaned ward datasets
 # Author: Jiwon Choi
-# Date: 26 November 2024
+# Date: 27 November 2024
 # Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: Data pre-processing scripts to clean the data
 
 #### Workspace setup ####
 library(tidyverse)
@@ -21,12 +20,13 @@ test_that("age dataset is not empty", {
 })
 
 test_that("age dataset contains expected columns", {
-  expected_columns <- c("City of Toronto Profiles", "Toronto", paste0("Ward", 1:25))
+  expected_columns <- c("Variable", "Minors", "Adult", "Middle_Age_Adult", "Senior_Adult")
   expect_true(all(expected_columns %in% names(data_age)))
 })
 
 test_that("age dataset contains valid population values", {
-  expect_true(all(data_age[2:nrow(data_age), -1] >= 0, na.rm = TRUE)) # Skip the profile names
+  numeric_columns <- data_age[, -1]  # Exclude 'Variable' column
+  expect_true(all(numeric_columns >= 0, na.rm = TRUE))
 })
 
 #### Test data_dwelling ####
@@ -35,12 +35,14 @@ test_that("dwelling dataset is not empty", {
 })
 
 test_that("dwelling dataset contains expected columns", {
-  expected_columns <- c("City of Toronto Profiles", "Toronto", paste0("Ward", 1:25))
+  expected_columns <- c("Variable", "Low_Density_Housing", "Medium_Density_Housing", 
+                        "High_Density_Housing", "Other_Types")
   expect_true(all(expected_columns %in% names(data_dwelling)))
 })
 
-test_that("dwelling dataset contains valid counts", {
-  expect_true(all(data_dwelling[2:nrow(data_dwelling), -1] >= 0, na.rm = TRUE)) # Skip the profile names
+test_that("dwelling dataset contains valid housing counts", {
+  numeric_columns <- data_dwelling[, -1]  # Exclude 'Variable' column
+  expect_true(all(numeric_columns >= 0, na.rm = TRUE))
 })
 
 #### Test data_household ####
@@ -49,12 +51,13 @@ test_that("household dataset is not empty", {
 })
 
 test_that("household dataset contains expected columns", {
-  expected_columns <- c("City of Toronto Profiles", "Toronto", paste0("Ward", 1:25))
+  expected_columns <- c("Variable", "Small_Households", "Medium_Households", "Large_Households")
   expect_true(all(expected_columns %in% names(data_household)))
 })
 
 test_that("household dataset contains valid household counts", {
-  expect_true(all(data_household[2:nrow(data_household), -1] >= 0, na.rm = TRUE)) # Skip the profile names
+  numeric_columns <- data_household[, -1]  # Exclude 'Variable' column
+  expect_true(all(numeric_columns >= 0, na.rm = TRUE))
 })
 
 #### Additional tests for dataset consistency ####
@@ -67,9 +70,9 @@ test_that("no missing values in numeric columns", {
 
 # Ensure datasets cover the same wards (consistency check)
 test_that("datasets cover the same wards", {
-  wards_age <- names(data_age)[-c(1, 2)]
-  wards_dwelling <- names(data_dwelling)[-c(1, 2)]
-  wards_household <- names(data_household)[-c(1, 2)]
+  wards_age <- data_age$Variable
+  wards_dwelling <- data_dwelling$Variable
+  wards_household <- data_household$Variable
   expect_setequal(wards_age, wards_dwelling)
   expect_setequal(wards_dwelling, wards_household)
 })
