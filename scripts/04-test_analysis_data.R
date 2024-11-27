@@ -1,69 +1,76 @@
 #### Preamble ####
-# Purpose: Tests... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 26 September 2024 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Tests the integrity and validity of the cleaned waste management dataset
+# Author: Jiwon Choi
+# Date: 26 November 2024
+# Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: 02-download_data_litter_bin.R, 03-clean_data_litter_bin.R
 
 
 #### Workspace setup ####
 library(tidyverse)
 library(testthat)
 
-data <- read_csv("data/02-analysis_data/analysis_data.csv")
+# Load the dataset
+data <- read_csv("../data/02-analysis_data/cleaned_data.csv")
 
 
 #### Test data ####
-# Test that the dataset has 151 rows - there are 151 divisions in Australia
-test_that("dataset has 151 rows", {
-  expect_equal(nrow(analysis_data), 151)
+# Test that the dataset has 10,468 rows
+test_that("dataset has 10,468 rows", {
+  expect_equal(nrow(data), 10468)
 })
 
-# Test that the dataset has 3 columns
-test_that("dataset has 3 columns", {
-  expect_equal(ncol(analysis_data), 3)
+# Test that the dataset has 4 columns
+test_that("dataset has 4 columns", {
+  expect_equal(ncol(data), 4)
 })
 
-# Test that the 'division' column is character type
-test_that("'division' is character", {
-  expect_type(analysis_data$division, "character")
+# Test that the `WARD` column is character type
+test_that("'WARD' is character", {
+  expect_type(data$WARD, "character")
 })
 
-# Test that the 'party' column is character type
-test_that("'party' is character", {
-  expect_type(analysis_data$party, "character")
+# Test that the `DAYS SERVICED` column is numeric
+test_that("'DAYS SERVICED' is numeric", {
+  expect_type(data$`DAYS SERVICED`, "double")
 })
 
-# Test that the 'state' column is character type
-test_that("'state' is character", {
-  expect_type(analysis_data$state, "character")
+# Test that the `ASSET TYPE` column is character type
+test_that("'ASSET TYPE' is character", {
+  expect_type(data$`ASSET TYPE`, "character")
+})
+
+# Test that the `STATUS` column is character type
+test_that("'STATUS' is character", {
+  expect_type(data$STATUS, "character")
 })
 
 # Test that there are no missing values in the dataset
 test_that("no missing values in dataset", {
-  expect_true(all(!is.na(analysis_data)))
+  expect_true(all(!is.na(data)))
 })
 
-# Test that 'division' contains unique values (no duplicates)
-test_that("'division' column contains unique values", {
-  expect_equal(length(unique(analysis_data$division)), 151)
+# Test that `WARD` contains unique values (e.g., no unrecognized wards)
+test_that("'WARD' column has expected values", {
+  valid_wards <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", 
+                   "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25")
+  expect_true(all(data$WARD %in% valid_wards))
 })
 
-# Test that 'state' contains only valid Australian state or territory names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", "Western Australia", 
-                  "Tasmania", "Northern Territory", "Australian Capital Territory")
-test_that("'state' contains valid Australian state names", {
-  expect_true(all(analysis_data$state %in% valid_states))
+# Test that `ASSET TYPE` contains expected categories
+test_that("'ASSET TYPE' column has expected categories", {
+  valid_asset_types <- c("WR1", "WR2", "WR3", "WR4", "WR5")
+  expect_true(all(data$`ASSET TYPE` %in% valid_asset_types))
 })
 
-# Test that there are no empty strings in 'division', 'party', or 'state' columns
-test_that("no empty strings in 'division', 'party', or 'state' columns", {
-  expect_false(any(analysis_data$division == "" | analysis_data$party == "" | analysis_data$state == ""))
+# Test that `STATUS` contains expected statuses
+test_that("'STATUS' column has expected statuses", {
+  valid_statuses <- c("Existing", "Temporarily Removed", "Permanently Removed")
+  expect_true(all(data$STATUS %in% valid_statuses))
 })
 
-# Test that the 'party' column contains at least 2 unique values
-test_that("'party' column contains at least 2 unique values", {
-  expect_true(length(unique(analysis_data$party)) >= 2)
+# Test that `DAYS SERVICED` has values within a reasonable range (e.g., 1 to 7)
+test_that("'DAYS SERVICED' values are within 1 to 7", {
+  expect_true(all(data$`DAYS SERVICED` >= 1 & data$`DAYS SERVICED` <= 7))
 })
