@@ -23,6 +23,8 @@ cleaned_data <- litter_bin_data %>%
   ) %>%
   drop_na()          # Remove rows with any missing values
 
+write_csv(cleaned_data, "data/02-analysis_data/cleaned_data.csv")
+
 # Convert WARD to Ward1, Ward2, ..., Ward25 format and ensure the order
 cleaned_data <- cleaned_data %>%
   mutate(WARD = paste0("Ward", as.numeric(WARD))) %>%
@@ -63,7 +65,20 @@ wide_data <- cleaned_data %>%
     values_from = Count,
     values_fill = 0
   )
+# Transpose the wide_data dataset
+transposed_data <- wide_data %>%
+  pivot_longer(
+    cols = -Value_Label, # Keep Value_Label as a fixed column
+    names_to = "WARD",
+    values_to = "Count"
+  ) %>%
+  pivot_wider(
+    names_from = Value_Label,
+    values_from = Count,
+    values_fill = 0
+  )
 
-# Save the transformed dataset
-write_csv(wide_data, "data/02-analysis_data/cleaned_data_litter.csv")
+# Save the transposed dataset
+write_csv(transposed_data, "data/02-analysis_data/cleaned_data_litter.csv")
+
 
