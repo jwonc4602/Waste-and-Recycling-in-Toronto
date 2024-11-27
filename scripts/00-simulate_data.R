@@ -1,52 +1,31 @@
 #### Preamble ####
-# Purpose: Simulates a dataset of Australian electoral divisions, including the 
-  #state and party that won each division.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Simulates a dataset based on the structure of the provided dataset
+# Author: Jiwon Choi
+# Date: 26 November 2024
+# Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: The `tidyverse` package must be installed
-# Any other information needed? Make sure you are in the `starter_folder` rproj
-
 
 #### Workspace setup ####
 library(tidyverse)
-set.seed(853)
-
+set.seed(1234)  # Ensure reproducibility
 
 #### Simulate data ####
-# State names
-states <- c(
-  "New South Wales",
-  "Victoria",
-  "Queensland",
-  "South Australia",
-  "Western Australia",
-  "Tasmania",
-  "Northern Territory",
-  "Australian Capital Territory"
+# Define possible values for each column
+wards <- unique(c(1:10))  # Simulate wards from 1 to 10
+days_serviced <- c(5, 6, 7)  # Possible service days
+asset_types <- c("WR1", "WR2", "WR3", "WR4")  # Asset types
+statuses <- c("Existing", "Temporarily Removed", "Removed")  # Status options
+
+# Simulate a dataset with 200 rows
+simulated_data <- tibble(
+  WARD = sample(wards, size = 200, replace = TRUE),
+  `DAYS SERVICED` = sample(days_serviced, size = 200, replace = TRUE),
+  `ASSET TYPE` = sample(asset_types, size = 200, replace = TRUE),
+  STATUS = sample(statuses, size = 200, replace = TRUE)
 )
-
-# Political parties
-parties <- c("Labor", "Liberal", "Greens", "National", "Other")
-
-# Create a dataset by randomly assigning states and parties to divisions
-analysis_data <- tibble(
-  division = paste("Division", 1:151),  # Add "Division" to make it a character
-  state = sample(
-    states,
-    size = 151,
-    replace = TRUE,
-    prob = c(0.25, 0.25, 0.15, 0.1, 0.1, 0.1, 0.025, 0.025) # Rough state population distribution
-  ),
-  party = sample(
-    parties,
-    size = 151,
-    replace = TRUE,
-    prob = c(0.40, 0.40, 0.05, 0.1, 0.05) # Rough party distribution
-  )
-)
-
 
 #### Save data ####
-write_csv(analysis_data, "data/00-simulated_data/simulated_data.csv")
+# Save the simulated dataset
+write_csv(simulated_data, "data/00-simulated_data/simulated_data.csv")
+

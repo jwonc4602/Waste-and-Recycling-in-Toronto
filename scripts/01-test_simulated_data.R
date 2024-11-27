@@ -1,15 +1,12 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated waste management dataset.
+# Author: Jiwon Choi
+# Date: 26 November 2024
+# Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-  # - The `tidyverse` package must be installed and loaded
-  # - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `starter_folder` rproj
-
+# - The `tidyverse` package must be installed and loaded
+# - 00-simulate_data.R must have been run
 
 #### Workspace setup ####
 library(tidyverse)
@@ -26,45 +23,54 @@ if (exists("analysis_data")) {
 
 #### Test data ####
 
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Check if the dataset has 200 rows
+if (nrow(analysis_data) == 200) {
+  message("Test Passed: The dataset has 200 rows.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  stop("Test Failed: The dataset does not have 200 rows.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
+# Check if the dataset has 4 columns
+if (ncol(analysis_data) == 4) {
+  message("Test Passed: The dataset has 4 columns.")
 } else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+  stop("Test Failed: The dataset does not have 4 columns.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+# Check if all values in the 'WARD' column are valid
+valid_wards <- unique(1:10)  # Wards from 1 to 10
+
+if (all(analysis_data$WARD %in% valid_wards)) {
+  message("Test Passed: The 'WARD' column contains only valid ward numbers.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  stop("Test Failed: The 'WARD' column contains invalid ward numbers.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
+# Check if the 'DAYS SERVICED' column contains only valid values
+valid_days <- c(5, 6, 7)
 
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+if (all(analysis_data$`DAYS SERVICED` %in% valid_days)) {
+  message("Test Passed: The 'DAYS SERVICED' column contains only valid values.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  stop("Test Failed: The 'DAYS SERVICED' column contains invalid values.")
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
+# Check if the 'ASSET TYPE' column contains only valid values
+valid_asset_types <- c("WR1", "WR2", "WR3", "WR4")
 
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+if (all(analysis_data$`ASSET TYPE` %in% valid_asset_types)) {
+  message("Test Passed: The 'ASSET TYPE' column contains only valid values.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  stop("Test Failed: The 'ASSET TYPE' column contains invalid values.")
+}
+
+# Check if the 'STATUS' column contains only valid values
+valid_statuses <- c("Existing", "Temporarily Removed", "Removed")
+
+if (all(analysis_data$STATUS %in% valid_statuses)) {
+  message("Test Passed: The 'STATUS' column contains only valid values.")
+} else {
+  stop("Test Failed: The 'STATUS' column contains invalid values.")
 }
 
 # Check if there are any missing values in the dataset
@@ -74,16 +80,18 @@ if (all(!is.na(analysis_data))) {
   stop("Test Failed: The dataset contains missing values.")
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
+# Check if there are no empty strings in the dataset
+if (all(analysis_data$WARD != "" & analysis_data$`DAYS SERVICED` != "" & 
+        analysis_data$`ASSET TYPE` != "" & analysis_data$STATUS != "")) {
+  message("Test Passed: There are no empty strings in the dataset.")
 } else {
   stop("Test Failed: There are empty strings in one or more columns.")
 }
 
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
+# Check if the 'STATUS' column has at least two unique values
+if (n_distinct(analysis_data$STATUS) >= 2) {
+  message("Test Passed: The 'STATUS' column contains at least two unique values.")
 } else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
+  stop("Test Failed: The 'STATUS' column contains less than two unique values.")
 }
+
