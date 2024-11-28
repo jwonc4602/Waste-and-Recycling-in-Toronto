@@ -28,54 +28,7 @@ cleaned_data <- cleaned_data %>%
   mutate(WARD = paste0("Ward", as.numeric(WARD))) %>%
   mutate(WARD = factor(WARD, levels = paste0("Ward", 1:25))) # Explicitly order WARD
 
-# Reshape the data to wide format
-wide_data <- cleaned_data %>%
-  mutate(across(
-    .cols = c('DAYS SERVICED', 'ASSET TYPE', STATUS),
-    .fns = as.character # Convert all columns to character to ensure compatibility
-  )) %>%
-  pivot_longer(
-    cols = c('DAYS SERVICED', 'ASSET TYPE', STATUS),
-    names_to = "Variable",
-    values_to = "Value"
-  ) %>%
-  mutate(Value_Label = case_when(
-    Variable == "DAYS SERVICED" ~ paste0("Days_serviced_", Value),
-    Variable == "ASSET TYPE" ~ paste0("Asset_type_", Value),
-    Variable == "STATUS" ~ paste0("Status_", Value)
-  )) %>%
-  # Explicitly order Value_Label
-  mutate(Value_Label = factor(
-    Value_Label,
-    levels = c(
-      # List days serviced in ascending order
-      paste0("Days_serviced_", sort(as.numeric(unique(litter_bin_data$'DAYS SERVICED')))),
-      # List asset types alphabetically
-      paste0("Asset_type_", sort(unique(litter_bin_data$'ASSET TYPE'))),
-      # List statuses alphabetically
-      paste0("Status_", sort(unique(litter_bin_data$STATUS)))
-    )
-  )) %>%
-  group_by(WARD, Value_Label) %>%
-  summarise(Count = n(), .groups = "drop") %>%
-  pivot_wider(
-    names_from = WARD,
-    values_from = Count,
-    values_fill = 0
-  )
-# Transpose the wide_data dataset
-transposed_data <- wide_data %>%
-  pivot_longer(
-    cols = -Value_Label, # Keep Value_Label as a fixed column
-    names_to = "WARD",
-    values_to = "Count"
-  ) %>%
-  pivot_wider(
-    names_from = Value_Label,
-    values_from = Count,
-    values_fill = 0
-  )
 
 # Save the transposed dataset
-write_csv(transposed_data, "data/02-analysis_data/cleaned_data_litter.csv")
+write_csv(cleaned_data, "data/02-analysis_data/cleaned_data_litter.csv")
 
