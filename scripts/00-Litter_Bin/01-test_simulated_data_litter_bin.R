@@ -7,91 +7,70 @@
 # Pre-requisites: 
 # - The `tidyverse` package must be installed and loaded
 # - 00-simulate_data.R must have been run
+# - The `testthat` package must be installed and loaded
 
 #### Workspace setup ####
 library(tidyverse)
+library(testthat)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
-
-# Test if the data was successfully loaded
-if (exists("analysis_data")) {
-  message("Test Passed: The dataset was successfully loaded.")
-} else {
-  stop("Test Failed: The dataset could not be loaded.")
-}
-
+# Load the dataset
+analysis_data <- read_csv("../../data/00-simulated_data/simulated_data.csv")
 
 #### Test data ####
 
+# Test if the data was successfully loaded
+test_that("Dataset is successfully loaded", {
+  expect_true(exists("analysis_data"))
+})
+
 # Check if the dataset has 200 rows
-if (nrow(analysis_data) == 200) {
-  message("Test Passed: The dataset has 200 rows.")
-} else {
-  stop("Test Failed: The dataset does not have 200 rows.")
-}
+test_that("Dataset has 200 rows", {
+  expect_equal(nrow(analysis_data), 200)
+})
 
 # Check if the dataset has 4 columns
-if (ncol(analysis_data) == 4) {
-  message("Test Passed: The dataset has 4 columns.")
-} else {
-  stop("Test Failed: The dataset does not have 4 columns.")
-}
+test_that("Dataset has 4 columns", {
+  expect_equal(ncol(analysis_data), 4)
+})
 
 # Check if all values in the 'WARD' column are valid
-valid_wards <- unique(1:10)  # Wards from 1 to 10
-
-if (all(analysis_data$WARD %in% valid_wards)) {
-  message("Test Passed: The 'WARD' column contains only valid ward numbers.")
-} else {
-  stop("Test Failed: The 'WARD' column contains invalid ward numbers.")
-}
+test_that("WARD column contains only valid values", {
+  valid_wards <- unique(1:10)  # Wards from 1 to 10
+  expect_true(all(analysis_data$WARD %in% valid_wards))
+})
 
 # Check if the 'DAYS SERVICED' column contains only valid values
-valid_days <- c(5, 6, 7)
-
-if (all(analysis_data$`DAYS SERVICED` %in% valid_days)) {
-  message("Test Passed: The 'DAYS SERVICED' column contains only valid values.")
-} else {
-  stop("Test Failed: The 'DAYS SERVICED' column contains invalid values.")
-}
+test_that("DAYS SERVICED column contains only valid values", {
+  valid_days <- c(5, 6, 7)
+  expect_true(all(analysis_data$`DAYS SERVICED` %in% valid_days))
+})
 
 # Check if the 'ASSET TYPE' column contains only valid values
-valid_asset_types <- c("WR1", "WR2", "WR3", "WR4")
-
-if (all(analysis_data$`ASSET TYPE` %in% valid_asset_types)) {
-  message("Test Passed: The 'ASSET TYPE' column contains only valid values.")
-} else {
-  stop("Test Failed: The 'ASSET TYPE' column contains invalid values.")
-}
+test_that("ASSET TYPE column contains only valid values", {
+  valid_asset_types <- c("WR1", "WR2", "WR3", "WR4")
+  expect_true(all(analysis_data$`ASSET TYPE` %in% valid_asset_types))
+})
 
 # Check if the 'STATUS' column contains only valid values
-valid_statuses <- c("Existing", "Temporarily Removed", "Removed")
-
-if (all(analysis_data$STATUS %in% valid_statuses)) {
-  message("Test Passed: The 'STATUS' column contains only valid values.")
-} else {
-  stop("Test Failed: The 'STATUS' column contains invalid values.")
-}
+test_that("STATUS column contains only valid values", {
+  valid_statuses <- c("Existing", "Temporarily Removed", "Removed")
+  expect_true(all(analysis_data$STATUS %in% valid_statuses))
+})
 
 # Check if there are any missing values in the dataset
-if (all(!is.na(analysis_data))) {
-  message("Test Passed: The dataset contains no missing values.")
-} else {
-  stop("Test Failed: The dataset contains missing values.")
-}
+test_that("Dataset contains no missing values", {
+  expect_true(all(!is.na(analysis_data)))
+})
 
 # Check if there are no empty strings in the dataset
-if (all(analysis_data$WARD != "" & analysis_data$`DAYS SERVICED` != "" & 
-        analysis_data$`ASSET TYPE` != "" & analysis_data$STATUS != "")) {
-  message("Test Passed: There are no empty strings in the dataset.")
-} else {
-  stop("Test Failed: There are empty strings in one or more columns.")
-}
+test_that("Dataset contains no empty strings", {
+  expect_true(all(analysis_data$WARD != "" & 
+                    analysis_data$`DAYS SERVICED` != "" & 
+                    analysis_data$`ASSET TYPE` != "" & 
+                    analysis_data$STATUS != ""))
+})
 
 # Check if the 'STATUS' column has at least two unique values
-if (n_distinct(analysis_data$STATUS) >= 2) {
-  message("Test Passed: The 'STATUS' column contains at least two unique values.")
-} else {
-  stop("Test Failed: The 'STATUS' column contains less than two unique values.")
-}
-
+test_that("STATUS column contains at least two unique values", {
+  expect_gte(n_distinct(analysis_data$STATUS), 2)
+})

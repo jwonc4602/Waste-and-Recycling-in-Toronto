@@ -10,100 +10,82 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(testthat)
 
 # Load the datasets
-age_data <- read_csv("data/00-simulated_data/simulated_age_data.csv")
-dwelling_data <- read_csv("data/00-simulated_data/simulated_dwelling_data.csv")
-household_data <- read_csv("data/00-simulated_data/simulated_household_data.csv")
+age_data <- read_csv("../../data/00-simulated_data/simulated_age_data.csv")
+dwelling_data <- read_csv("../../data/00-simulated_data/simulated_dwelling_data.csv")
+household_data <- read_csv("../../data/00-simulated_data/simulated_household_data.csv")
 
 #### Test Age Dataset ####
 
-message("Testing Age Dataset...")
-# Test if the dataset was successfully loaded
-if (exists("age_data")) {
-  message("Test Passed: Age dataset loaded successfully.")
-} else {
-  stop("Test Failed: Age dataset could not be loaded.")
-}
+# Test if the age dataset was successfully loaded
+test_that("Age Dataset: Successfully loaded", {
+  expect_true(exists("age_data"))
+})
 
-# Check if the dataset has the correct number of rows
-expected_age_rows <- 19  # 19 age groups
-if (nrow(age_data) == expected_age_rows) {
-  message("Test Passed: Age dataset has the correct number of rows.")
-} else {
-  stop("Test Failed: Age dataset does not have the correct number of rows.")
-}
+# Check if the age dataset has the correct number of rows
+test_that("Age Dataset: Correct number of rows", {
+  expected_age_rows <- 19  # 19 age groups
+  expect_equal(nrow(age_data), expected_age_rows)
+})
 
-# Check if the dataset has the correct number of columns
-expected_wards <- 25  # Wards 1 to 25
-if (ncol(age_data) == (expected_wards + 2)) {  # +2 for 'City of Toronto Profiles' and 'Toronto'
-  message("Test Passed: Age dataset has the correct number of columns.")
-} else {
-  stop("Test Failed: Age dataset does not have the correct number of columns.")
-}
+# Check if the age dataset has the correct number of columns
+test_that("Age Dataset: Correct number of columns", {
+  expected_wards <- 25  # Wards 1 to 25
+  expect_equal(ncol(age_data), expected_wards + 2)  # +2 for 'City of Toronto Profiles' and 'Toronto'
+})
 
 #### Test Dwelling Type Dataset ####
 
-message("Testing Dwelling Type Dataset...")
-# Test if the dataset was successfully loaded
-if (exists("dwelling_data")) {
-  message("Test Passed: Dwelling dataset loaded successfully.")
-} else {
-  stop("Test Failed: Dwelling dataset could not be loaded.")
-}
+# Test if the dwelling type dataset was successfully loaded
+test_that("Dwelling Dataset: Successfully loaded", {
+  expect_true(exists("dwelling_data"))
+})
 
-# Check if the dataset has the correct number of rows
-expected_dwelling_rows <- 8  # 8 dwelling types
-if (nrow(dwelling_data) == expected_dwelling_rows) {
-  message("Test Passed: Dwelling dataset has the correct number of rows.")
-} else {
-  stop("Test Failed: Dwelling dataset does not have the correct number of rows.")
-}
+# Check if the dwelling type dataset has the correct number of rows
+test_that("Dwelling Dataset: Correct number of rows", {
+  expected_dwelling_rows <- 8  # 8 dwelling types
+  expect_equal(nrow(dwelling_data), expected_dwelling_rows)
+})
 
-# Check if the dataset has the correct number of columns
-if (ncol(dwelling_data) == (expected_wards + 2)) {  # +2 for 'City of Toronto Profiles' and 'Toronto'
-  message("Test Passed: Dwelling dataset has the correct number of columns.")
-} else {
-  stop("Test Failed: Dwelling dataset does not have the correct number of columns.")
-}
+# Check if the dwelling type dataset has the correct number of columns
+test_that("Dwelling Dataset: Correct number of columns", {
+  expected_wards <- 25  # Wards 1 to 25
+  expect_equal(ncol(dwelling_data), expected_wards + 2)  # +2 for 'City of Toronto Profiles' and 'Toronto'
+})
 
 #### Test Household Size Dataset ####
 
-message("Testing Household Size Dataset...")
-# Test if the dataset was successfully loaded
-if (exists("household_data")) {
-  message("Test Passed: Household dataset loaded successfully.")
-} else {
-  stop("Test Failed: Household dataset could not be loaded.")
-}
+# Test if the household size dataset was successfully loaded
+test_that("Household Dataset: Successfully loaded", {
+  expect_true(exists("household_data"))
+})
 
-# Check if the dataset has the correct number of rows
-expected_household_rows <- 6  # 6 household sizes
-if (nrow(household_data) == expected_household_rows) {
-  message("Test Passed: Household dataset has the correct number of rows.")
-} else {
-  stop("Test Failed: Household dataset does not have the correct number of rows.")
-}
+# Check if the household size dataset has the correct number of rows
+test_that("Household Dataset: Correct number of rows", {
+  expected_household_rows <- 6  # 6 household sizes
+  expect_equal(nrow(household_data), expected_household_rows)
+})
 
-# Check if the dataset has the correct number of columns
-if (ncol(household_data) == (expected_wards + 2)) {  # +2 for 'City of Toronto Profiles' and 'Toronto'
-  message("Test Passed: Household dataset has the correct number of columns.")
-} else {
-  stop("Test Failed: Household dataset does not have the correct number of columns.")
-}
+# Check if the household size dataset has the correct number of columns
+test_that("Household Dataset: Correct number of columns", {
+  expected_wards <- 25  # Wards 1 to 25
+  expect_equal(ncol(household_data), expected_wards + 2)  # +2 for 'City of Toronto Profiles' and 'Toronto'
+})
 
 #### General Validity Tests ####
 
-# Check for missing values in all datasets
-datasets <- list(age_data = age_data, dwelling_data = dwelling_data, household_data = household_data)
-
-for (name in names(datasets)) {
-  data <- datasets[[name]]
-  if (all(!is.na(data))) {
-    message(paste("Test Passed:", name, "dataset contains no missing values."))
-  } else {
-    stop(paste("Test Failed:", name, "dataset contains missing values."))
+# Check if all datasets contain no missing values
+test_that("All datasets contain no missing values", {
+  datasets <- list(age_data = age_data, dwelling_data = dwelling_data, household_data = household_data)
+  
+  for (name in names(datasets)) {
+    data <- datasets[[name]]
+    expect_true(all(!is.na(data)), info = paste(name, "dataset contains missing values."))
   }
-}
+})
 
-message("All tests completed.")
+#### Completion Message ####
+# Message to indicate that all tests have been run
+message("All tests completed successfully.")
