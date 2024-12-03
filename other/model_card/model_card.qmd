@@ -3,7 +3,7 @@ title: "Model Card for Litter Bin Status Model"
 subtitle: "Bayesian Logistic Regression for Predicting Litter Bin Status"
 author: 
   - Jiwon Choi
-thanks: "Code and data are available at: LINK."
+thanks: "Code and data are available at: https://github.com/jwonc4602/Waste-and-Recycling-in-Toronto."
 date: today
 date-format: long
 format: pdf
