@@ -45,8 +45,8 @@ dwelling_type_data <- read.csv(file = here("data/02-analysis_data/ward_data_dwel
 household_size_data <- read.csv(file = here("data/02-analysis_data/ward_data_household_size.csv"))
 litter_data <- read.csv(file = here("data/02-analysis_data/cleaned_data_litter.csv"))
 
-combined_data <- read.csv(file = here("data/02-analysis_data/combined_data_with_predictions.csv"))
-with_prediction <- read.csv(file = here("data/02-analysis_data/combined_data.csv"))
+combined_data <- read.csv(file = here("data/02-analysis_data/combined_data.csv"))
+with_prediction <- read.csv(file = here("data/02-analysis_data/combined_data_with_predictions.csv"))
 
 # read in model
 model <- readRDS(file = here("models/status_model.rds"))
@@ -94,29 +94,53 @@ selected_columns <- c(1:4)
 kable(head(litter_data[, selected_columns], 5), format = "latex", booktabs = TRUE, align = "c")
 
 ```
+This dataset provides metrics on waste collection across Toronto's 25 wards, offering insights into the types of litter bins used (WR1-WR5), their status, and the frequency of servicing. Service levels reflect how often bins are collected, but this only applies to bins classified as "existing." Bins marked as "planned" or "temporarily removed" are not currently collected. The data are essential for understanding waste collection distribution and infrastructure usage in Toronto (see @tbl-cleaned-litter-data). They help evaluate the efficiency of services, identify areas that may be underperforming, and ensure waste management resources are allocated equitably across the city.
 
-1. **Litter Data (`cleaned_data_litter.csv`)**:
-   - **Description**: This dataset contains metrics on waste collection across Toronto's 25 wards. It includes information on the frequency of servicing, the types of litter bins used (WR1-WR5), and their status. Service levels indicate the frequency at which bins are collected, but this only applies to bins with a status of "existing." Bins with a status of "planned" or "temporarily removed" are not currently collected.
-   - **Context**: These data are critical for understanding the distribution and frequency of waste collection services, as well as the infrastructure used for waste management. The broader implications include evaluating service efficiency, identifying underperforming areas, and ensuring equitable allocation of waste management resources.
-   - **Variables**:
-     - **Days Serviced**: The frequency of waste collection for "existing" bins, categorized into one day, three days, or five days of servicing per week.
-     - **Asset Types (WR1-WR5)**:
-       - **WR1**: A plastic litter bin model with two ports of entry – one for litter and one for recycling.
-       - **WR2**: A plastic litter bin model with three ports of entry – one for litter and two for recycling.
-       - **WR3**: A steel litter bin model on a raised concrete pedestal with two ports – one for litter and one for recycling.
-       - **WR4**: A steel litter bin model with three ports of entry shaped differently from WR1 and WR2 – one for litter and two for recycling.
-       - **WR5**: The newest bin model with larger ports – two for litter and one for recycling.
-     - **Bin Status**:
-       - **Existing**: Bins currently deployed and actively serviced.
-       - **Planned**: Bins intended for future installation but not yet deployed or serviced.
-       - **Temporarily Removed**: Bins removed temporarily (e.g., for repairs or reallocation) and not currently being serviced.
-     - **Ward Identifiers**: Numerical identifiers corresponding to the 25 wards in Toronto.
-   - **Key Context**: The relationship between bin types, status, and service frequency can provide insights into operational efficiency and resource allocation. The presence of planned and temporarily removed bins highlights future changes and potential service gaps.
+The dataset includes key details about litter bin operations. Days Serviced shows how often waste is collected from active bins, categorized as once, three times, or five times per week. Bin Status indicates whether a bin is "Existing" (currently deployed and serviced), or "Temporarily Removed" (taken out of service for repairs or reallocation). Ward Identifiers are numbers assigned to Toronto’s 25 wards, helping analyze how bins are distributed and serviced across the city.
+
+@fig-bin-status-by-ward shows the distribution of Bin Status across Toronto's 25 wards, categorizing bins as "Existing" or "Temporarily Removed." "Existing" bins dominate in all wards, reflecting their primary role in waste management, while "Temporarily Removed" bins are fewer and vary between wards. Ward 13 and Ward 14 have noticeably higher counts of "Temporarily Removed" bins, possibly due to maintenance or reallocation efforts, while wards like Ward 1, Ward 5, and Ward 25 have very few removed bins, indicating more stable deployment. Wards such as Ward 10, Ward 13, and Ward 14 also have the highest overall bin counts, suggesting higher population density or waste generation in these areas. In contrast, wards like Ward 19 and Ward 23 have fewer bins overall, reflecting lower demand or different waste management strategies. This variation highlights how bin allocation and maintenance align with the specific needs of each ward.
+
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: plt-asset-type-frequency
+#| label: fig-bin-status-by-ward
+#| fig-cap: Bar Chart of Bin Status by Ward
+
+# Ensure the Ward column exists and is processed correctly
+litter_data$WARD <- factor(litter_data$WARD, levels = paste0("Ward", 1:25))
+
+# Aggregate the data by Ward and Bin Status
+agg_data <- litter_data %>%
+  group_by(WARD, STATUS) %>%
+  summarise(Count = n()) %>%
+  ungroup()
+
+# Create the plot
+ggplot(agg_data, aes(x = WARD, y = Count, fill = STATUS)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(
+    x = "Ward",
+    y = "Count",
+    fill = "Bin Status",
+    title = "Bar Chart of Bin Status by Ward"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+The waste receptacles (WRs) in the dataset are categorized into five asset types, each designed for different functionalities and usage scenarios. WR1 is a plastic litter bin with two ports of entry: one for litter and one for recycling, promoting basic waste segregation. WR2 is another plastic litter bin but with three ports of entry, offering enhanced recycling options with one port for litter and two for recycling. WR3 is distinct from the plastic bins, being a steel litter bin model elevated on a raised concrete pedestal. It has two ports: one for litter and one for recycling. WR4, like WR3, is made of steel but features a unique design with three ports of entry: one for litter and two for recycling, catering to larger waste disposal needs. Finally, WR5 is the newest and most advanced bin model. It features larger ports designed for higher volume, with two dedicated ports for litter and one for recycling, facilitating more efficient waste handling.
+
+@fig-asset-type-frequency provides a summary of the distribution of asset types across the dataset. It is evident that WR2 is the most common asset type, with over 4,000 bins recorded. This is followed by WR1, which accounts for a significant proportion of the bins. WR4 is the third most prevalent, while WR3 has the lowest representation in the dataset. Notably, WR5 is not represented in this particular figure, likely because it is a newer model and may not yet be widely deployed.
+
+@fig-line-asset-type-by-ward takes a closer look at the distribution of asset types by ward. It reveals interesting patterns of deployment across different areas. WR2 dominates in most wards, indicating its preference or suitability for general use across the city. WR1 and WR4 show moderate but variable distributions, with certain wards showing higher counts than others. In contrast, WR3 is consistently low across all wards, reflecting its specialized or limited application. The variation in asset type distribution across wards suggests a strategic allocation based on population density, waste generation patterns, or local recycling initiatives.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-asset-type-frequency
 #| fig-cap: Frequency of Litter Bins by Asset Type across the City
 
 ggplot(litter_data, aes(x = `ASSET.TYPE`)) +
@@ -129,7 +153,7 @@ ggplot(litter_data, aes(x = `ASSET.TYPE`)) +
 #| echo: false
 #| message: false
 #| warning: false
-#| label: plt-line-asset-type-by-ward
+#| label: fig-line-asset-type-by-ward
 #| fig-cap: Line Graph of Asset Types by Ward
 
 # Convert the WARD column to a factor with levels in the desired order
@@ -139,8 +163,7 @@ ggplot(litter_data, aes(x = WARD, group = `ASSET.TYPE`, color = `ASSET.TYPE`)) +
   geom_line(stat = "count", size = 1) +
   geom_point(stat = "count", size = 2) +
   theme_minimal() +
-  labs(title = "Asset Types by Ward",
-       x = "Ward", y = "Count", color = "Asset Type") +
+  labs(x = "Ward", y = "Count", color = "Asset Type") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
@@ -161,11 +184,8 @@ ggplot(litter_data, aes(x = `ASSET.TYPE`, fill = `STATUS`)) +
 
 ## Ward Profile Data
 
-1. **Age Demographics (`ward_data_age.csv`)**:
-   - **Description**: Contains age distribution data for Toronto, divided into multiple age groups (e.g., "0 to 4 years", "15 to 19 years"). These data provide a detailed view of the population composition by ward.
-   - **Context**: Understanding the age demographics is crucial, as waste generation often varies by age group due to differing consumption and waste production behaviors. For example, younger age groups might contribute to higher waste from disposable items, while older populations might contribute to other types of waste patterns.
-   - **Variables**: Total population, age groups (e.g., "0 to 4 years", "65+ years"), ward identifiers.
-   - **Key Context**: Variations in age distributions across wards could explain differences in waste types (e.g., recyclable materials vs. organic waste).
+### Age Demographics
+The dataset contains age distribution data for Toronto, categorized into multiple age groups (e.g., "0 to 4 years", "15 to 19 years") and organized by ward (see @tbl-cleaned-age-data). This data provides insights into the population composition, which is crucial for understanding waste generation patterns, as these often vary by age group due to differing consumption and waste production behaviors. For instance, younger age groups may generate more waste from disposable items, while older populations might contribute differently to waste streams. Key variables include the total population, specific age groups (e.g., "0 to 4 years" and "65+ years"), and ward identifiers. Variations in age distributions across wards may help explain differences in waste types, such as recyclable materials versus organic waste, highlighting the importance of tailoring waste management strategies to demographic profiles.
 ```{r}
 #| echo: false
 #| message: false
@@ -179,11 +199,12 @@ kable(head(age_data[, selected_columns], 5), format = "latex", booktabs = TRUE, 
 
 ```
 
+@fig-population-trends illustrates population trends across Toronto’s 25 wards, segmented by age groups: Minors, Adults, Middle-Age Adults, and Senior Adults. Among these, the Adult group (ages 20–39) shows the highest population counts in most wards, with a notable peak in Ward 13, likely reflecting areas with higher concentrations of working-age individuals or young families. The Middle-Age Adult group (ages 40–59) is relatively consistent across wards, with slight variations but no extreme outliers. The Senior Adult population (ages 60 and above) is distributed more evenly across wards, maintaining lower but steady numbers compared to younger groups. Minors (ages 0–19) also show consistent trends across wards, though their numbers are generally lower compared to Adults and Middle-Age Adults. It highlights Ward 13 as an outlier with a significantly larger population of Adults, which may correspond to areas with higher density housing or urban centers. This variation in age distribution by ward offers insights into the demographics influencing waste generation, consumption patterns, and service needs in different areas of the city.
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: plt-population-trends
+#| label: fig-population-trends
 #| fig-cap: Population Trends Across Wards by Age Group
 #| 
 age_data_long <- pivot_longer(age_data, cols = c(Minors, Adult, Middle_Age_Adult, Senior_Adult), 
@@ -197,18 +218,15 @@ ggplot(age_data_long, aes(x = Variable, y = Population, group = Age_Group, color
   geom_line(size = 1) +
   geom_point(size = 2) +
   theme_minimal() +
-  labs(title = "Population Trends Across Wards by Age Group",
+  labs(
        x = "Ward", y = "Population", color = "Age Group") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 ```
 
-2. **Dwelling Type (`ward_data_dwelling_type.csv`)**:
-   - **Description**: Provides data on housing structures across wards, including single-detached homes, semi-detached homes, row houses, and apartments.
-   - **Context**: Different dwelling types are associated with varying waste generation trends. For instance, single-detached homes might produce more organic waste due to larger gardens, while apartment residents might contribute more to recyclable waste streams.
-   - **Variables**: Total dwellings, dwelling type categories (e.g., single-detached, semi-detached, row houses, apartments), ward identifiers.
-   - **Key Context**: The mix of dwelling types in a ward could influence waste service requirements and resource planning.
+### Dwelling Type 
+The dataset includes data on housing structures across Toronto's wards, categorized into four main dwelling types: Single-Detached and Semi-Detached Homes, Row Houses and Duplexes, Apartments in Buildings with Fewer or More Than Five Storeys, and Other Housing Types (such as movable dwellings or other single-attached houses). This categorization enables a clearer understanding of housing diversity and its potential impact on waste generation. For example, single-detached and semi-detached homes might produce more organic waste due to larger gardens and outdoor spaces, while apartments, particularly in high-rise buildings, are more likely to generate higher volumes of recyclable waste. Key variables include total dwellings, these dwelling type categories, and ward identifiers. The mix of dwelling types in each ward provides valuable context for tailoring waste management services and resource allocation, as different housing types often correlate with distinct waste generation patterns and service needs.
 
 ```{r}
 #| echo: false
@@ -221,11 +239,14 @@ dwelling_type_data <- dwelling_type_data
 selected_columns <- c(1:5)
 kable(head(dwelling_type_data[, selected_columns], 5), format = "latex", booktabs = TRUE, align = "c")
 ```
+
+@fig-housing-trends illustrates the distribution of housing types across Toronto’s 25 wards, categorized into High-Density Housing (e.g., apartments in buildings with five or more storeys), Medium-Density Housing (e.g., row houses, duplexes), Low-Density Housing (e.g., single-detached and semi-detached homes), and Other Types (e.g., movable dwellings or other single-attached houses). High-Density Housing dominates in most wards, particularly in Ward 13 and Ward 14, which show significant peaks, likely reflecting urban centers with a prevalence of apartment buildings. Low-Density Housing is more evenly distributed, with some wards, such as Ward 15 and Ward 25, having notable proportions, indicating suburban or less dense residential areas. Medium-Density Housing remains consistent across wards, with smaller fluctuations, while Other Types are minimal and consistent across all wards. This distribution highlights how different housing types contribute to the urban landscape and influence waste management needs, as denser housing typically generates higher volumes of recyclables, whereas low-density areas may produce more organic and mixed waste due to larger properties and gardens. The variation across wards underscores the importance of tailoring waste services to local housing patterns.
+
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: plt-housing-trends
+#| label: fig-housing-trends
 #| fig-cap: Trends in Housing Types Across Wards
  
 dwelling_data_long <- pivot_longer(dwelling_type_data, cols = c(Low_Density_Housing, Medium_Density_Housing,High_Density_Housing, Other_Types), names_to = "Housing_Type", values_to = "Count")
@@ -243,11 +264,8 @@ ggplot(dwelling_data_long, aes(x = Variable, y = Count, group = Housing_Type, co
 
 ```
 
-3. **Household Size (`ward_data_household_size.csv`)**:
-   - **Description**: Details the distribution of households by size across Toronto's wards, including one-person to multi-person households.
-   - **Context**: Household size is an important factor in waste generation, as larger households might produce more waste overall but less per capita, while single-person households might generate more waste in packaging and convenience items.
-   - **Variables**: Total households, household size categories (e.g., one-person, two-person, three-person households), ward identifiers.
-   - **Key Context**: Larger households may necessitate additional or larger waste bins, while smaller households might correlate with more frequent servicing needs.
+### Household Size 
+The dataset provides details on the distribution of households by size across Toronto's wards, categorized into three main groups: Small Households (1-2 persons), Medium Households (3-4 persons), and Large Households (5 or more persons). This categorization helps analyze how household size impacts waste generation and management needs. Small households, which include one-person and two-person households, may generate more waste in packaging and convenience items due to individual consumption patterns. In contrast, Medium and Large households are likely to produce more waste overall but less per capita, as resources are shared among members. Key variables include the total number of households, these household size categories, and ward identifiers. Larger households may require additional or larger waste bins to manage higher waste volumes, while smaller households may necessitate more frequent waste servicing. Understanding these patterns is essential for optimizing waste collection services and resource allocation tailored to household composition across wards.
 
 ```{r}
 #| echo: false
@@ -261,11 +279,13 @@ selected_columns <- c(1:4)
 kable(head(household_size_data[, selected_columns], 5), format = "latex", booktabs = TRUE, align = "c")
 ```
 
+@fig-household-size-by-ward illustrates the distribution of household sizes across Toronto’s 25 wards, segmented into Small Households (1-2 persons), Medium Households (3-4 persons), and Large Households (5 or more persons). Small households dominate across all wards, with particularly high counts in Ward 13 and Ward 14, likely due to urban areas with higher concentrations of single or two-person living arrangements, such as apartments or smaller housing units. Medium households show relatively consistent numbers across wards, reflecting stable family-sized living arrangements. Large households, while the least common, remain evenly distributed across wards, likely representing areas with larger homes suited for extended families or multi-generational living. The prevalence of small households suggests higher waste generation per capita, particularly in terms of packaging and convenience items, while medium and large households may generate more waste overall but share resources among members. This variation emphasizes the need for tailored waste collection strategies, such as larger bins for wards with more medium and large households and frequent servicing in wards with a high concentration of small households.
+
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: plt-household-size-by-ward
+#| label: fig-household-size-by-ward
 #| fig-cap: Distribution of Household Sizes by Ward
 
 household_size_data_long <- pivot_longer(household_size_data, cols = c(Small_Households, Medium_Households, Large_Households), names_to = "Household_Size", values_to = "Count")
@@ -285,59 +305,47 @@ ggplot(household_size_data_long, aes(x = Variable, y = Count, group = Household_
 ```
 
 ## **Measurement**
-The data used in this analysis represent a snapshot of various real-world phenomena related to waste management and demographics in Toronto:
-- **Litter Data**: Measurements for waste collection frequency and asset type were obtained from municipal waste management systems that track service days, infrastructure usage, and bin status. Only bins with a status of "existing" are actively serviced, highlighting the importance of this subset in current operations.
-- **Age Demographics**: The age data originate from census or municipal records, offering a detailed breakdown of population characteristics. These measurements are essential for linking demographic factors with observed waste trends.
-- **Dwelling Types and Household Sizes**: These data are derived from housing and census records. They reflect the physical and social structures within each ward, providing a critical lens for understanding waste behaviors and resource needs.
-
-By integrating service levels, bin status, and demographic factors, this dataset provides a robust foundation for analyzing waste management strategies, identifying inefficiencies, and planning for equitable and effective resource distribution across Toronto's neighborhoods.
+The litter data were obtained from municipal waste management systems, which track service frequency, bin asset types, and statuses. Only bins with a status of "existing" are actively serviced, emphasizing the operational significance of this subset. This information reflects the day-to-day functioning of waste collection systems and provides critical insights into infrastructure usage and service patterns. Age demographics data originate from census or municipal records, offering a detailed breakdown of population characteristics by ward. These measurements help link demographic factors, such as age distribution, to observed waste generation trends. Similarly, data on dwelling types and household sizes were derived from housing and census records, capturing the physical and social structures within each ward. These variables provide a critical lens for understanding waste behaviors, such as the impact of housing density and household composition on waste production and service needs. Together, these datasets bridge real-world waste management and demographic dynamics with the structured entries analyzed in this study.
 
 # Model
 
-### Bayesian Logistic Regression Model to Predict Litter Bin Status
+To predict the binary status of litter bins (`STATUS`), where 1 indicates "Existing" and 0 indicates "Not Existing," we employ a **Bayesian logistic regression model**. This approach allows the incorporation of prior beliefs and the handling of uncertainty, providing a robust framework for predictions based on observed data.
 
-We employ a **Bayesian logistic regression model** to predict the binary status of litter bins (`STATUS`), where 1 indicates "Existing" and 0 indicates "Not Existing." This model enables us to incorporate prior beliefs and uncertainty while making predictions based on observed data.
+The logistic regression model is defined as follows:
 
-#### Model Specification
+\begin{equation}
+log(\frac{\hat{p}}{1 - \hat{p}}) = \beta_{0} + \beta_{1}x_{STATUS} +
+\beta_{2}x_{ASSET.TYPE} + \beta_{3}x_{DAYS.SERVICED} + \beta_{4}x_{Low.Density.Housing} + \beta_{5}x_{High.Density.Housing}
+\label{eq:logit}
+\end{equation}
 
-The logistic regression model is defined as:
+In this model:
 
-*equation*
+- \(\text{STATUS}_i\) represents the binary outcome variable for the \(i\)-th observation, where 1 indicates "Existing" and 0 indicates "Not Existing."
+- \(\text{ASSET.TYPE}_i\) is a categorical variable that captures the type of litter bin asset.
+- \(\text{DAYS.SERVICED}_i\) denotes the number of days per week the litter bin is serviced.
+- \(\text{Low.Density.Housing}_i\), \(\text{Medium.Density.Housing}_i\), and \(\text{High.Density.Housing}_i\) represent the proportions of low-, medium-, and high-density housing in the corresponding ward, respectively.
+- \(\beta_0\) is the intercept term, while \(\beta_1, \beta_2, \dots, \beta_5\) are the coefficients corresponding to each predictor.
 
-Where:
-- \(\text{STATUS}_i\): Binary outcome variable for the \(i\)-th observation (1 = "Existing", 0 = "Not Existing").
-- \(\text{ASSET.TYPE}_i\): Categorical variable representing the type of litter bin asset.
-- \(\text{DAYS.SERVICED}_i\): Numeric variable indicating the number of days the litter bin is serviced weekly.
-- \(\text{Low.Density.Housing}_i\): Proportion of low-density housing in the corresponding ward.
-- \(\text{Medium.Density.Housing}_i\): Proportion of medium-density housing in the corresponding ward.
-- \(\text{High.Density.Housing}_i\): Proportion of high-density housing in the corresponding ward.
-- \(\beta_0\): Intercept term.
-- \(\beta_1, \beta_2, \dots, \beta_5\): Coefficients for the respective predictors.
+In equation \ref{eq:logit}, each $\beta$ represents a coefficient determined through Bayesian regression analysis. The variables chosen for this project are `ASSET.TYPE`, `DAYS.SERVICED`, and housing density variables (`Low.Density.Housing`, `Medium.Density.Housing`, and `High.Density.Housing`). These predictors were selected because they capture key aspects of waste management dynamics. For example, `ASSET.TYPE` reflects characteristics of litter bin types that may influence their operational status, while `DAYS.SERVICED` indicates the frequency of maintenance, which is likely correlated with the bin's likelihood of remaining operational. Housing density variables were included to account for urbanization levels, as areas with higher population density may have different waste management needs and bin usage patterns compared to less dense areas.
 
-#### Justification of Features
+Once the Bayesian logistic regression model is developed, we will use the `predict()` function in R's `rstanarm` package [@citeR] to generate posterior predictions for bin statuses. This allows us to incorporate uncertainty into our predictions and evaluate the probability of each litter bin being "Existing" or "Not Existing." These predictions will then be analyzed across different asset types and servicing frequencies, providing actionable insights into waste management strategies.
 
-1. **ASSET.TYPE**: Captures the characteristics of litter bin types, which may influence their status.
-2. **DAYS.SERVICED**: Reflects the maintenance frequency, potentially correlating with the likelihood of a bin remaining operational.
-3. **Housing Density Variables**: Indicate urbanization levels, which could affect waste management dynamics and bin usage patterns.
+The regression analysis will be performed using the `stan_glm()` function in R [@citeR], specifically chosen for its ability to handle binary outcomes like the operational status of litter bins. Logistic regression is particularly suited to this analysis due to the binary nature of the response variable and the expected S-shaped relationship between the predictors and the probability of bin existence. The Bayesian framework further enhances this approach by allowing us to incorporate prior knowledge and quantify uncertainty in our parameter estimates and predictions.
 
-#### Model Implementation
-The model was implemented in R using the `rstanarm` package, which facilitates Bayesian modeling and inference. Key parameters include:
-- **Iterations**: 4000 (2000 warmup, 2000 sampling).
-- **Chains**: 4 for robust posterior estimation.
-- **Adapt delta**: 0.95 to ensure convergence.
-- **Seed**: 1234 for reproducibility.
+There are, however, some limitations to our model. The binary outcome restricts the analysis to whether a bin exists or not, without considering intermediate statuses such as partial serviceability or varying levels of operational efficiency. Additionally, the model's accuracy is contingent upon the quality and representativeness of the data used. Unobserved factors, such as specific policy changes or environmental conditions, are not included, which could impact the generalizability of our findings to other contexts or time periods.
 
-#### Limitations and Assumptions
-- **Assumption**: The relationship between predictors and the logit of the outcome is linear.
-- **Limitation**: Potential unobserved confounders, such as policy or environmental factors, are not included.
-- **Applicability**: This model may not generalize well to contexts with significantly different housing or servicing dynamics.
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-status-prediction
+#| tbl-cap: Sample of Predicted Litter Bin Prediction
 
-#### Alternative Models Considered
-1. **Random Forests**: Explored for non-linear relationships but deemed less interpretable for this context.
-2. **Generalized Linear Models (Non-Bayesian)**: Rejected due to the need for explicit incorporation of prior beliefs.
-
-The Bayesian logistic regression model balances complexity and interpretability, making it well-suited for predicting litter bin statuses.
-
+with_prediction <- with_prediction
+selected_columns <- c(1, 3:4, 16)
+kable(head(with_prediction[, selected_columns], 5), format = "latex", booktabs = TRUE, align = "c")
+```
 
 # Results
 ## Overview of Coefficients from the Bayesian Logistic Regression Model
@@ -478,53 +486,33 @@ plot(model, "rhat") + theme_minimal()
 ```
 
 ## Idealized Survey and Methodology {#subsec-ideal-survey}
-
 ### Survey Design
 
-To evaluate waste generation and collection patterns in Toronto comprehensively, an idealized survey would focus on both primary data collection and observational methods to supplement existing datasets. This methodology would aim to bridge potential gaps in current data, such as individual household contributions, temporal variations, and socio-economic nuances.
-
-1. **Objective**: 
-   - To capture detailed waste generation behaviors across diverse demographic and dwelling groups.
-   - To assess the alignment of waste collection services with actual waste production.
-
-2. **Target Population**: 
-   - All 25 wards of Toronto, stratified by key demographic (e.g., age distribution, household size) and dwelling characteristics (e.g., low-density, medium-density, and high-density housing).
-
-3. **Sampling Framework**:
-   - **Stratified Random Sampling**: To ensure representation across wards and household types, the population will be divided into strata based on demographic and housing attributes.
-   - **Sample Size**: A minimum of 500 households per ward to achieve statistical power while allowing granular analysis of trends.
+To comprehensively evaluate waste generation and collection patterns in Toronto, an ideal survey design would combine primary data collection with observational methods to supplement existing datasets. This approach aims to address potential gaps, such as individual household contributions, temporal variations, and socio-economic nuances. The primary objective is twofold: to capture detailed waste generation behaviors across diverse demographic and dwelling groups and to assess how well waste collection services align with actual waste production. The target population includes all 25 wards in Toronto, stratified by demographic characteristics (e.g., age distribution, household size) and dwelling types (e.g., low-density, medium-density, and high-density housing). To ensure adequate representation, a stratified random sampling framework will be employed, dividing the population into strata based on demographic and housing attributes. A minimum of 500 households per ward will be sampled to achieve statistical power and allow for granular trend analysis.
 
 ### Survey Instrument
 
-The survey will consist of:
-- **Waste Metrics**: Questions on the type (recyclable, organic, landfill) and volume of waste generated weekly.
-- **Demographic Variables**: Age, household size, income bracket, and dwelling type.
-- **Service Feedback**: Satisfaction levels with current waste collection schedules and services.
-- **Behavioral Insights**: Practices like recycling habits, composting, and waste reduction strategies.
+The survey will gather information on key metrics, including the type (recyclable, organic, landfill) and volume of waste generated weekly, demographic variables like age, household size, income bracket, and dwelling type, and feedback on current waste collection schedules and services. Additionally, behavioral insights, such as recycling habits, composting practices, and waste reduction strategies, will be captured. This multi-faceted approach aims to provide a detailed understanding of waste management practices at the household level.
 
 ### Observational Data Collection
 
-1. **Direct Observation**: Trained enumerators will record waste bin fullness and mismanagement incidents in sampled neighborhoods weekly.
-2. **IoT Sensors**: Pilot testing in high-density wards to measure bin utilization rates and waste type segregation.
+To complement survey data, direct observational methods will be employed. Trained enumerators will record waste bin fullness and instances of mismanagement weekly in sampled neighborhoods. Furthermore, pilot testing of IoT sensors in high-density wards will measure bin utilization rates and segregation of waste types, offering objective, real-time data on waste collection and generation patterns.
 
-#### Simulation for Optimal Sampling
+### Simulation for Optimal Sampling
 
-- **Simulation Framework**: A simulation will evaluate the effectiveness of different sampling strategies. For example, comparing simple random sampling to stratified methods using metrics like bias and variance in waste volume estimates.
-- **Tool**: Simulations will be run using R, leveraging the `survey` and `sampling` packages.
+A simulation framework will be developed to evaluate the effectiveness of various sampling strategies, such as comparing simple random sampling with stratified methods. Key metrics, including bias and variance in waste volume estimates, will guide the assessment. The simulation will be conducted using R, leveraging the `survey` and `sampling` packages to ensure methodological rigor and reliability.
 
 ### Data Linkages and Validation
 
-1. **Cross-Validation**: Collected survey data will be cross-referenced with municipal records to ensure consistency and fill missing gaps (e.g., wards with outdated data).
-2. **Linkage to Literature**: Studies on urban waste management and demographic influences will guide the interpretation of trends.
+Survey data will be cross-validated with municipal records to ensure consistency and address gaps, particularly in wards with outdated information. Findings will also be contextualized using existing literature on urban waste management and demographic influences, ensuring that observed trends align with broader theoretical and empirical insights.
 
 ### Anticipated Challenges
 
-1. **Non-Response Bias**: Households unwilling to participate may introduce demographic skewness, particularly in low-income areas.
-2. **Temporal Changes**: Data collected during specific seasons may not reflect year-round waste trends, necessitating longitudinal follow-ups.
+Two key challenges are anticipated. First, non-response bias may arise if households, particularly in low-income areas, are unwilling to participate, introducing demographic skewness. Second, seasonal variations in waste generation may necessitate longitudinal follow-ups to capture year-round trends. These challenges will be addressed through strategic planning and adjustments in data collection protocols.
 
 ### Contribution to Measurement Validity
 
-This detailed survey and observational framework would enhance the robustness of the study by incorporating granular, household-level insights. It would also provide a benchmark for validating predictive models developed in the main analysis, ensuring the alignment of theoretical estimates with real-world dynamics. This approach builds on the best practices in survey methodology while addressing gaps in the current data landscape.
+This survey and observational framework enhances the robustness of the study by integrating granular, household-level insights with broader observational data. It provides a solid foundation for validating predictive models developed in the main analysis, ensuring that theoretical estimates align with real-world dynamics. By addressing existing gaps in the data landscape, this approach contributes to a more accurate and comprehensive understanding of waste generation and collection patterns in Toronto.
 \newpage
 
 
