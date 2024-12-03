@@ -8,7 +8,6 @@ date: today
 date-format: long
 format: pdf
 number-sections: true
-#bibliography: references.bib
 ---
 
 # Model Details
@@ -81,7 +80,3 @@ number-sections: true
 - **Guidance:** Users should ensure that input data follows the same preprocessing steps. Periodic retraining is recommended for sustained accuracy.
 - **Monitoring:** Model predictions should be regularly evaluated against updated waste management data to detect drift.
 
-
-\newpage
-
-# References
