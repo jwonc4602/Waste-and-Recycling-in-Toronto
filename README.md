@@ -1,30 +1,25 @@
-# Starter folder
+# Waste and Recycling in Toronto
 
 ## Overview
 
-This repo provides students with a foundation for their own projects associated with *Telling Stories with Data*. You do not need every aspect for every paper and you should delete aspects that you do not need.
-
+This repository analyzes waste management in Toronto from 2021 to 2024, focusing on efficiency and equity. It examines how demographics, housing, and waste collection patterns affect servicing needs and highlights ways to optimize resource allocation. The findings provide practical insights and a framework for fair and sustainable urban waste systems.
 
 ## File Structure
 
 The repo is structured as:
 
--   `data/raw_data` contains the raw data as obtained from X.
--   `data/analysis_data` contains the cleaned dataset that was constructed.
--   `model` contains fitted models. 
--   `other` contains relevant literature, details about LLM chat interactions, and sketches.
+-   `data/00-simulated_data` contains the simulated datasets.
+-   `data/01-raw_data` contains the raw data as obtained from [Open Data Toronto](https://open.toronto.ca/).
+    - [Litter Bin Data](https://open.toronto.ca/dataset/litter-bin-collection-frequency/)
+    - [Ward Profile Data](https://open.toronto.ca/dataset/ward-profiles-25-ward-model/)
+-   `data/02-analysis_data` contains the cleaned dataset that was constructed.
+-   `model` contains fitted model. 
+-   `other` contains model card, and sketches.
 -   `paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper. 
--   `scripts` contains the R scripts used to simulate, download and clean data.
-
+-   `scripts` contains the R scripts used to simulate, download and clean data and modelling.
+    -   `scripts/00-Litter_Bin` contains the R scripts used to simulate, download and clean data for litter bin data.
+    -   `scripts/01-Ward_Profile` contains the R scripts used to simulate, download and clean data for ward profile data.
 
 ## Statement on LLM usage
 
-Aspects of the code were written with the help of the auto-complete tool, Codriver. The abstract and introduction were written with the help of ChatHorse and the entire chat history is available in inputs/llms/usage.txt.
-
-## Some checks
-
-- [ ] Change the rproj file name so that it's not starter_folder.Rproj
-- [ ] Change the README title so that it's not Starter folder
-- [ ] Remove files that you're not using
-- [ ] Update comments in R scripts
-- [ ] Remove this checklist
+None of the components of this work involved the use of LLMs.
