@@ -25,18 +25,11 @@ library(here)
 library(ggplot2)
 library(knitr)
 library(kableExtra)
-library(tidyverse)
-library(ggplot2)
 library(dplyr)
 library(readr)
-library(here)
 library(gridExtra)
 library(grid)
-library(tidyverse)
-library(here)
-library(kableExtra)
 library(broom.mixed)
-library(knitr)
 library(rstanarm)
 
 # read in cleaned data #
@@ -123,8 +116,7 @@ ggplot(agg_data, aes(x = WARD, y = Count, fill = STATUS)) +
   labs(
     x = "Ward",
     y = "Count",
-    fill = "Bin Status",
-    title = "Bar Chart of Bin Status by Ward"
+    fill = "Bin Status"
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -258,7 +250,7 @@ ggplot(dwelling_data_long, aes(x = Variable, y = Count, group = Housing_Type, co
   geom_line(size = 1) +
   geom_point(size = 2) +
   theme_minimal() +
-  labs(title = "Trends in Housing Types Across Wards",
+  labs(
        x = "Ward", y = "Count", color = "Housing Type") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -297,7 +289,7 @@ ggplot(household_size_data_long, aes(x = Variable, y = Count, group = Household_
   geom_line(size = 1) +
   geom_point(size = 2) +
   theme_minimal() +
-  labs(title = "Trends in Household Sizes Across Wards",
+  labs(
        x = "Ward", y = "Count", color = "Household Size") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
