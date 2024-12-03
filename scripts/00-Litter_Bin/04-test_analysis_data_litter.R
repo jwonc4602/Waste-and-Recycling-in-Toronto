@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Tests the integrity and validity of the cleaned waste management dataset
+# Purpose: Tests the integrity and validity of the cleaned litter bin dataset
 # Author: Jiwon Choi
 # Date: 26 November 2024
 # Contact: jwon.choi@mail.utoronto.ca

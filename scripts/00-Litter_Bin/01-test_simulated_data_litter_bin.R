@@ -1,12 +1,12 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated waste management dataset.
+# Purpose: Tests the structure and validity of the simulated litter bin dataset.
 # Author: Jiwon Choi
 # Date: 26 November 2024
 # Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
 # - The `tidyverse` package must be installed and loaded
-# - 00-simulate_data.R must have been run
+# - 00-simulate_data_litter_bin.R must have been run
 # - The `testthat` package must be installed and loaded
 
 #### Workspace setup ####

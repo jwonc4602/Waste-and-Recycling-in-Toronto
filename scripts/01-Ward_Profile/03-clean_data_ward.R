@@ -1,10 +1,10 @@
 #### Preamble ####
-# Purpose: Downloads, processes, renames variables, removes NA rows and columns, and saves the 2023 Ward Profiles Census Data.
+# Purpose: Clean the ward profile data for further analysis.
 # Author: Jiwon Choi
 # Date: 26 November 2024
 # Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: Ensure necessary R libraries are installed.
+# Pre-requisites: 02-download_data_ward.py
 
 #### Workspace setup ####
 library(tidyverse)

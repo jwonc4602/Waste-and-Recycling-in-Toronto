@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Simulates a dataset based on the structure of the provided dataset
+# Purpose: Simulates litter bin dataset
 # Author: Jiwon Choi
 # Date: 26 November 2024
 # Contact: jwon.choi@mail.utoronto.ca

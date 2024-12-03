@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Cleans the raw litter bin data for analysis of equity and prediction models.
+# Purpose: Cleans the raw litter bin data for analysis
 # Author: Jiwon Choi
 # Date: 26 November 2024
 # Contact: jwon.choi@mail.utoronto.ca

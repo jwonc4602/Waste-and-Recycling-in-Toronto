@@ -1,14 +1,12 @@
 #### Preamble ####
 # Purpose: Downloads and saves data from the City of Toronto's Open Data Portal 
-#          on litter bin collection frequency for further analysis.
+#          on litter bin collection frequency dataset
 # Author: Jiwon Choi
 # Date: 27 November 2024
 # Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: Ensure necessary R libraries (`opendatatoronto`, `readr`) are installed 
 #                 and have an active internet connection to access the data portal.
-# Any other information needed? Ensure write permissions to the `data/01-raw_data/` directory 
-#                               to save the downloaded dataset.
 
 
 #### Workspace setup ####
