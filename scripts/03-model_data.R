@@ -67,5 +67,5 @@ data$High_Density_Housing <- as.numeric(data$High_Density_Housing)
 data$Predicted_Probability <- predict(model, newdata = data, type = "response")
 
 # Save the updated dataset with predictions
-write.csv(data, "data/02-analysis_data/combined_data_with_predictions.csv", row.names = FALSE)
+write.csv(data, "data/02-analysis_data/combined_data_with_predictions.csv")
 
